@@ -2,8 +2,8 @@
 
 $finder = Symfony\Component\Finder\Finder::create()
     ->in([
-        __DIR__ . '/src',
-        __DIR__ . '/tests',
+        __DIR__.'/src',
+        __DIR__.'/tests',
     ])
     ->name('*.php')
     ->notName('*.blade.php')
@@ -30,6 +30,9 @@ return (new PhpCsFixer\Config())
             'elements' => [
                 'method' => 'one',
             ],
+        ],
+        'function_declaration' => [
+            'closure_function_spacing' => 'one',
         ],
         'method_argument_space' => [
             'on_multiline' => 'ensure_fully_multiline',

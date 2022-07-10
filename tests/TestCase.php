@@ -2,24 +2,21 @@
 
 namespace Jhavenz\NovaExtendedFields\Tests;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Jhavenz\NovaExtendedFields\NovaExtendedFieldsServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
+use Spatie\LaravelRay\RayServiceProvider;
 
 class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
         parent::setUp();
-
-        Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Jhavenz\\NovaExtendedFields\\Database\\Factories\\'.class_basename($modelName).'Factory'
-        );
     }
 
     protected function getPackageProviders($app)
     {
         return [
+            RayServiceProvider::class,
             NovaExtendedFieldsServiceProvider::class,
         ];
     }
@@ -27,10 +24,5 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_nova-extended-fields_table.php.stub';
-        $migration->up();
-        */
     }
 }
