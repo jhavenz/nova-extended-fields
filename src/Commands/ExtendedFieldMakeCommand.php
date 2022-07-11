@@ -3,7 +3,9 @@
 namespace Jhavenz\NovaExtendedFields\Commands;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Jhavenz\NovaExtendedFields\Support\NovaFieldFinder;
 use Laravel\Nova\Fields\Text;
 use RuntimeException;
@@ -21,6 +23,12 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
     ';
     private string $errorMessage;
     private string $targetDir;
+
+    public function __construct(
+        private NovaFieldFinder $novaFieldFinder,
+    ) {
+        parent::__construct(app(Filesystem::class));
+    }
 
     public function handle(): int
     {
@@ -119,14 +127,29 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
 
     private function extendParentField(string $stub): string
     {
-        $parentNamespace =
-            app(NovaFieldFinder::class)->getNamespacedNovaField($this->argument('parent-field') ?: Text::class);
+        $parentNamespace = $this->novaFieldFinder->namespacedNovaField($this->argument('parent-field') ?: Text::class);
 
-        $stub = str_replace(
-            '{{ parentNamespace }}',
-            $parentNamespace,
-            $stub
-        );
+        $parentBasename = class_basename($parentNamespace);
+
+        if ($parentBasename === Str::studly($this->argument('class'))) {
+            // if users class is named the same as the extending class
+            $parentBasename = $parentNamespace;
+        }
+
+        if ($parentNamespace !== $parentBasename) {
+            $stub = str_replace(
+                '{{ parentNamespace }}',
+                $parentNamespace,
+                $stub
+            );
+        } else {
+            // remove the use statement, we're going to extend the parent's FQCN 
+            str_replace(
+                'use {{ parentNamespace }};',
+                '',
+                $stub
+            );
+        }
 
         return str_replace(
             '{{ parentBasename }}',

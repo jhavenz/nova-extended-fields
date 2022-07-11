@@ -3,10 +3,8 @@
 namespace Jhavenz\NovaExtendedFields\Support;
 
 use Illuminate\Foundation\PackageManifest;
-use Illuminate\Support\Str;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Fields\Text;
-use PhpClass\PhpClass;
 use Symfony\Component\Finder\Finder;
 
 use function Jhavenz\rescueQuietly;
@@ -15,24 +13,32 @@ class NovaFieldFinder
 {
     private static array $fields = [];
 
-    public function getNamespacedNovaField(string $targetField): string
+    public function namespacedNovaField(string $targetField): string
     {
         if ($key = $this->fieldsSearch($targetField)) {
             return self::$fields[$key];
         }
 
         foreach (self::novaFieldsFinder() as $fieldFile) {
+            $phpClass = new PhpClass($fieldFile->getRealPath());
+
             $class = rescueQuietly(
-                fn() => (new PhpClass($fieldFile->getRealPath()))->instantiate(),
+                fn() => $phpClass->instantiate(),
+                fn() => rescueQuietly(
+                    fn() => $phpClass->fqcn(),
+                    fn() => $fieldFile->getFilename()
+                )
             );
 
-            if (empty($class) || !$class instanceof Field) {
-                continue;
+            if (is_string($class)) {
+                self::$fields[strtolower(class_basename($class))] = $class;
+                file_exists($class) && self::$fields[basename($class, 'php')] = basename($class, 'php');
             }
 
-            // cache as we go
-            self::$fields[$class::class] = $class::class;
-            self::$fields[Str::studly(class_basename($class))] = $class::class;
+            if ($class instanceof Field) {
+                self::$fields[strtolower(class_basename($class))] = $class::class;
+                self::$fields[$class::class] = $class::class;
+            }
 
             if ($key = $this->fieldsSearch($targetField)) {
                 return self::$fields[$key];
@@ -46,6 +52,7 @@ class NovaFieldFinder
     protected static function novaFieldsFinder()
     {
         return Finder::create()
+            ->files()
             ->in(self::novaFieldsDir())
             ->ignoreVCSIgnored(false)
             ->ignoreUnreadableDirs();
@@ -75,11 +82,15 @@ class NovaFieldFinder
     private function fieldsSearch(string $key): string|false
     {
         if (array_key_exists($key, self::$fields)) {
-            return self::$fields[$key];
+            return $key;
         }
 
-        if (array_key_exists($key = Str::studly(class_basename($key)), self::$fields)) {
-            return self::$fields[$key];
+        if (array_key_exists($two = basename($key, 'php'), self::$fields)) {
+            return $two;
+        }
+
+        if (array_key_exists($key = strtolower(class_basename($key)), self::$fields)) {
+            return $key;
         }
 
         return false;
