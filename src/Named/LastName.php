@@ -1,11 +1,11 @@
 <?php
 
-namespace Jhavenz\NovaExtendedFields\Contactable;
+namespace Jhavenz\NovaExtendedFields\Named;
 
 use Jhavenz\NovaExtendedFields\Concerns\ExtendedNovaField;
 use Laravel\Nova\Fields\Field;
 
-class FullName extends Field
+class LastName extends Field
 {
     use ExtendedNovaField;
 }

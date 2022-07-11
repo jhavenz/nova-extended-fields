@@ -51,7 +51,7 @@ class NovaUser extends Resource
 **To something like this:**
 
 ```php
-use App\Nova\Resources\Fields\Contactable\Name;
+use App\Nova\Resources\Fields\Internet\Name;
 
 namespace App\Nova\Resources;
 
@@ -76,12 +76,20 @@ Let's dive in...
 
 ---
 
-## Installation
+### Installation
 
 You can install the package via composer:
 
 ```bash
 composer require jhavenz/nova-extended-fields
+```
+
+### Config
+
+You can publish the config file with:
+
+```bash
+php artisan vendor:publish --tag="nova-extended-fields"
 ```
 
 ### General Usage and Configuration
@@ -97,6 +105,7 @@ e.g. the `FullName` field can be resolved using `app(FullName::class)` and so on
 
 Should you need to completely rewire the way that a field is being resolved, you can overwrite any/all the bindings as
 you see fit (though this shouldn't be necessary most of the time).
+
 _note: you can look at the tests for any examples_
 
 ---
@@ -116,7 +125,7 @@ This would look something like this:
 
 namespace App\Nova\Resources\Fields\Shared;
 
-use Jhavenz\NovaExtendedFields\Contactable\FullName;
+use Jhavenz\NovaExtendedFields\Named\FullName;
 
 class MyAppFullName extends FullName
 {

@@ -1,29 +1,63 @@
 <?php
 
-use Jhavenz\NovaExtendedFields\Contactable;
+use Jhavenz\NovaExtendedFields\Internet;
+use Jhavenz\NovaExtendedFields\Named;
 
 return [
     'fields' => [
-        Contactable\FullName::class => [
-            'name' => 'Name',
+        Named\FullName::class => [
+            'name' => 'Full Name',
             'attribute' => 'full_name',
             'resolveCallback' => null,
-            'configurables' => [
+            'behaviors' => [
                 'sortable' => true,
                 'creationRules' => [],
-                'updateRules' => [],
-                'rules' => [],
+                'updateRules' => ['sometimes', 'nullable', 'string', 'min:6', 'max:50'],
+                'rules' => ['required', 'string', 'min:6', 'max:50'],
             ],
         ],
-        Contactable\Email::class => [
+        Named\FirstName::class => [
+            'name' => 'First Name',
+            'attribute' => 'first_name',
+            'resolveCallback' => null,
+            'behaviors' => [
+                'sortable' => true,
+                'creationRules' => [],
+                'updateRules' => ['sometimes', 'nullable', 'string', 'min:6', 'max:50', 'email'],
+                'rules' => ['required', 'string', 'min:6', 'max:50'],
+            ],
+        ],
+        Named\LastName::class => [
+            'name' => 'Last Name',
+            'attribute' => 'last_name',
+            'resolveCallback' => null,
+            'behaviors' => [
+                'sortable' => true,
+                'creationRules' => [],
+                'updateRules' => ['sometimes', 'nullable', 'string', 'min:6', 'max:50', 'email'],
+                'rules' => ['required', 'string', 'min:6', 'max:50'],
+            ],
+        ],
+        Named\DisplayName::class => [
+            'name' => 'Display Name',
+            'attribute' => 'display_name',
+            'resolveCallback' => null,
+            'behaviors' => [
+                'sortable' => true,
+                'creationRules' => [],
+                'updateRules' => ['sometimes', 'nullable', 'string', 'min:6', 'max:50', 'email'],
+                'rules' => ['required', 'string', 'min:6', 'max:50'],
+            ],
+        ],
+        Internet\Email::class => [
             'name' => 'Email',
             'attribute' => 'email',
             'resolveCallback' => null,
-            'configurables' => [
+            'behaviors' => [
                 'sortable' => true,
-                'creationRules' => ['required', 'max:255', 'min:6', 'email',/** 'unique:<table>,email' ? */],
-                'updateRules' => ['sometimes', 'nullable', 'max:255', 'min:6', 'email',/** 'unique:<table>,email' ? */],
-                'rules' => [],
+                'creationRules' => [],
+                'updateRules' => ['sometimes', 'nullable', 'min:6', 'max:50', 'email',/** 'unique:<table>,email' ? */],
+                'rules' => ['required', 'min:6', 'max:50', 'email',/** 'unique:<table>,email' ? */],
             ],
         ],
     ],
