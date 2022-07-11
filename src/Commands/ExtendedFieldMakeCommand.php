@@ -4,6 +4,8 @@ namespace Jhavenz\NovaExtendedFields\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Facades\File;
+use Jhavenz\NovaExtendedFields\NovaExtendedFields;
+use Laravel\Nova\Fields\Text;
 use RuntimeException;
 
 class ExtendedFieldMakeCommand extends GeneratorCommand
@@ -13,18 +15,18 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
     protected $signature = 'nova:extended-field
                                                 {class : Class name of the field}
                                                 {category : The directory the field will be placed in. (Relative to your root Nova directory)}
+                                                {parent-field? : The Nova field you would like to extend}
                                                 {--nova-path= : Absolute Path to the [Nova] directory in your project}
                                                 {--force-overwrite : Overwrite this file if it exists}
     ';
     private string $errorMessage;
     private string $targetDir;
 
-    /**
-     * TODO - Add {{ field }} param that allows the user to extend any of the Nova fields
-     */
     public function handle(): int
     {
-        $stub = $this->buildClass($class = $this->argument('class'));
+        $stub = $this->extendParentField(
+            $this->buildClass($class = $this->argument('class'))
+        );
 
         if (!empty($this->errorMessage)) {
             $this->output->error($this->errorMessage);
@@ -33,7 +35,7 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
         }
 
         $filename = str($class)->studly()->append('.php');
-        $filePath = $filename->prepend($this->targetDir);
+        $filePath = $filename->prepend($this->targetDir.DIRECTORY_SEPARATOR);
 
         if (File::exists($filePath) && !$this->option('force-overwrite')) {
             $this->output->error("Unauthorized attempt to overwrite an existing Resource, bailing out...");
@@ -46,10 +48,13 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
                 throw new RuntimeException("Could not write to $filePath");
             }
 
-            $this->output->success("Successfully wrote $class!");
+            $this->output->success($filename->basename('.php')->append(' field written successfully'));
 
             return self::SUCCESS;
         } catch (\Throwable $e) {
+            $this->output->error('Error while writing file: '.$e->getMessage());
+
+            return self::FAILURE;
         }
     }
 
@@ -110,5 +115,22 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
         );
 
         return $this;
+    }
+
+    private function extendParentField(string $stub): string
+    {
+        $parentNamespace = NovaExtendedFields::getNamespacedNovaField($this->argument('parent-field') ?: Text::class);
+
+        $stub = str_replace(
+            '{{ parentNamespace }}',
+            $parentNamespace,
+            $stub
+        );
+
+        return str_replace(
+            '{{ parentBasename }}',
+            class_basename($parentNamespace),
+            $stub
+        );
     }
 }

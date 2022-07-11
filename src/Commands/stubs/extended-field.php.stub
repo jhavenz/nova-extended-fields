@@ -3,9 +3,9 @@
 namespace {{ rootNamespace }};
 
 use Jhavenz\NovaExtendedFields\Concerns\ExtendedNovaField;
-use Laravel\Nova\Fields\Field;
+use {{ parentNamespace }};
 
-class {{ class }} extends Field
+class {{ class }} extends {{ parentBasename }}
 {
     use ExtendedNovaField;
 }

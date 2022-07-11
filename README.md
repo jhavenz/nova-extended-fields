@@ -12,6 +12,9 @@ So, instead of something like this in your Nova project:
 _fyi...`rescueQuietly()` is just a helper I use a lot who's 3rd argument (`$report: true`) for the `rescue` method is
 set to `false`_
 
+> Important:
+> This package is still in development/pre-release mode. Please do not use in production yet.
+
 ```php
 <?php
 

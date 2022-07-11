@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Foundation\PackageManifest;
 use Jhavenz\NovaExtendedFields\Named\FullName;
 use Jhavenz\NovaExtendedFields\NovaExtendedFields as NEF;
 use Jhavenz\NovaExtendedFields\Tests\fixtures\User;
@@ -53,6 +54,7 @@ it('can have a custom resolver using config params', closure: function () {
 });
 
 it('can have a custom resolver using field params', closure: function () {
+    dd(app(PackageManifest::class)->vendorPath.'/laravel/');
     expect(FullName::field())->resolveCallback->toBeNull();
 
     $field = FullName::field([
