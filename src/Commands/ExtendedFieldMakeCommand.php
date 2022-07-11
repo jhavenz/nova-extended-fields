@@ -4,7 +4,7 @@ namespace Jhavenz\NovaExtendedFields\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Facades\File;
-use Jhavenz\NovaExtendedFields\NovaExtendedFields;
+use Jhavenz\NovaExtendedFields\Support\NovaFieldFinder;
 use Laravel\Nova\Fields\Text;
 use RuntimeException;
 
@@ -119,7 +119,8 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
 
     private function extendParentField(string $stub): string
     {
-        $parentNamespace = NovaExtendedFields::getNamespacedNovaField($this->argument('parent-field') ?: Text::class);
+        $parentNamespace =
+            app(NovaFieldFinder::class)->getNamespacedNovaField($this->argument('parent-field') ?: Text::class);
 
         $stub = str_replace(
             '{{ parentNamespace }}',
