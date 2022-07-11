@@ -4,12 +4,14 @@ Personally, I'm not a fan of configuring all of my Nova fields within the 'field
 
 Additionally, most of the fields used across Nova projects tend to have a lot in common...
 
-So isn't there a better way than having to repeat all this logic for each project, plus needing to 
-configure each field with an array and having to (visually) parse through all fields to find the one 
+So isn't there a better way than having to repeat all this logic for each project, plus needing to
+configure each field with an array and having to (visually) parse through all fields to find the one
 you're looking for each time? That's what this package aims to fix.
 
 So, instead of something like this in your Nova project:
-_fyi...`rescueQuietly()` is just a helper I use a lot who's 3rd argument (`$report: true`) for the `rescue` method is set to `false`_
+_fyi...`rescueQuietly()` is just a helper I use a lot who's 3rd argument (`$report: true`) for the `rescue` method is
+set to `false`_
+
 ```php
 
 use Laravel\Nova\Fields\Text;
@@ -38,8 +40,9 @@ public function fields(NovaRequest $request): array
 ```
 
 To something like this:
+
 ```php
-use App\Nova\Resources\Fields\Shared\Name;
+use App\Nova\Resources\Fields\Contactable\Name;
 
 public function fields(NovaRequest $request): array
     {
@@ -51,10 +54,11 @@ public function fields(NovaRequest $request): array
 ```
 
 And now the `Name` field lives in its own file, which would look something like this:
+
 ```php
 <?php
 
-namespace App\Nova\Resources\Fields\Shared;
+namespace App\Nova\Resources\Fields\Contactable;
 
 use App\Nova\Resources\Concerns\ExtendedNovaField;
 use Laravel\Nova\Fields\Text;
@@ -62,26 +66,18 @@ use Laravel\Nova\Fields\Text;
 class FullName extends Text
 {
     use ExtendedNovaField;
-
-    public function __construct($name = null, $attribute = null, callable $resolveCallback = null)
-    {
-        parent::__construct(
-            $name ?? 'Name',
-            $attribute ?? 'full_name',
-            $resolveCallback
-        );
-    }
 }
 ```
-_note: the default constructor params must be null so they're compatible with the Nova source code_
 
 ---
 
-I've only recently started (as of 07/2022) pulling out the common fields that I use in my own Nova projects, but eventually I plan
+I've only recently started (as of 07/2022) pulling out the common fields that I use in my own Nova projects, but
+eventually I plan
 to move all into this package.
 You'll find a lot of the common fields in here, and I'd welcome contributions for more!
 
-A non-exhaustive list of the fields included are: 
+A non-exhaustive list of the fields included are:
+
 - FullName
 - FirstName
 - LastName
@@ -104,9 +100,51 @@ composer require jhavenz/nova-extended-fields
 
 ## Additional Usage
 
+As mentioned, each field now has its own file which can also be extended for more advanced usage.
+
+This is common for situations where you require custom logic that's beyond the capabilities of the config file.
+
+One example would be the need to use custom `fillUsing` logic.
+
+Now that we're working with the field directly, we would use the `fillAttributeFromRequest` method (instead of providing
+a callback to `fillUsing`)
+
+This would look something like this:
+
 ```php
-// TODO - explain field customizations in more detail...
+<?php
+
+namespace App\Nova\Resources\Fields\Shared;
+
+use Jhavenz\NovaExtendedFields\Contactable\FullName;
+
+class MyAppFullName extends FullName
+{
+    /**
+     * Maybe our database only has [first_name] and [last_name] columns. 
+     * So we need to split the full name before saving it the database...
+     */
+    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
+    {
+        [$firstName, $lastName] = $request->input($requestAttribute);
+          
+        $model->first_name = $firstName;
+        $model->last_name = $lastName;
+        
+        # Note:
+        # Laravel will call the save() method automatically after this method completes
+    }
+}
 ```
+
+> **Tip:**
+> There are a lot of other methods on a `Fields` instance that, once knowing the specific type of field we're working
+> with, can then be overridden which helps to significantly DRY up your code!
+>
+> In cases where you may have two different models that share the same field, it helps to create a specific file for
+> each model. For example, a `UserEmail` field may have its own requirements/logic vs a `CompanyEmail` field.
+> Creating a file for each of these models allows you to write the logic that's specific to each one.
+> These fields can then be used as the source of truth throughout all your Nova projects!
 
 ## Testing
 

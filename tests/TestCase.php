@@ -3,6 +3,8 @@
 namespace Jhavenz\NovaExtendedFields\Tests;
 
 use Jhavenz\NovaExtendedFields\NovaExtendedFieldsServiceProvider;
+use Laravel\Nova\NovaApplicationServiceProvider;
+use Laravel\Nova\NovaCoreServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\LaravelRay\RayServiceProvider;
 
@@ -17,7 +19,10 @@ class TestCase extends Orchestra
     {
         return [
             RayServiceProvider::class,
+            NovaCoreServiceProvider::class,
+            NovaApplicationServiceProvider::class,
             NovaExtendedFieldsServiceProvider::class,
+
         ];
     }
 
