@@ -13,10 +13,17 @@ _fyi...`rescueQuietly()` is just a helper I use a lot who's 3rd argument (`$repo
 set to `false`_
 
 ```php
+<?php
+
+namespace App\Nova\Resources;
 
 use Laravel\Nova\Fields\Text;
 
-public function fields(NovaRequest $request): array
+class NovaUser extends Resource
+{
+    //...
+    
+    public function fields(NovaRequest $request): array
     {
         return [
             Text::make('Full Name')
@@ -37,58 +44,37 @@ public function fields(NovaRequest $request): array
             // ...other fields
         ];
     }
+}
+
 ```
 
-To something like this:
+**To something like this:**
 
 ```php
 use App\Nova\Resources\Fields\Contactable\Name;
 
-public function fields(NovaRequest $request): array
+namespace App\Nova\Resources;
+
+use Laravel\Nova\Fields\Text;
+
+class NovaUser extends Resource
+{
+    public function fields(NovaRequest $request): array
     {
         return [
             FullName::field(),
+            
             // ...other fields
         ];
     }
-```
-
-And now the `Name` field lives in its own file, which would look something like this:
-
-```php
-<?php
-
-namespace App\Nova\Resources\Fields\Contactable;
-
-use App\Nova\Resources\Concerns\ExtendedNovaField;
-use Laravel\Nova\Fields\Text;
-
-class FullName extends Text
-{
-    use ExtendedNovaField;
 }
 ```
 
+aahhh 🤗, that's much better!
+
+Let's dive in...
+
 ---
-
-I've only recently started (as of 07/2022) pulling out the common fields that I use in my own Nova projects, but
-eventually I plan
-to move all into this package.
-You'll find a lot of the common fields in here, and I'd welcome contributions for more!
-
-A non-exhaustive list of the fields included are:
-
-- FullName
-- FirstName
-- LastName
-- Email
-- NumericPrimaryKey
-- UsersRole (based a very basic authorization system)
-- UserPassword
-- UserPasswordConfirmation
-- Avatar
-
-_More may have been added since the time of writing_
 
 ## Installation
 
@@ -98,16 +84,30 @@ You can install the package via composer:
 composer require jhavenz/nova-extended-fields
 ```
 
-## Additional Usage
+### General Usage and Configuration
 
-As mentioned, each field now has its own file which can also be extended for more advanced usage.
+As mentioned, each extended field now has its own class and can be easily configured using this package's config file.
 
-This is common for situations where you require custom logic that's beyond the capabilities of the config file.
+As you'll see, I've listed out some sane defaults which you'll find in the config file.
+Feel free to change any of the configurations to the needs of your app.
 
-One example would be the need to use custom `fillUsing` logic.
+Additionally, you'll notice that the static `::field()` method is used whenever instantiating a field. This is because
+each extended field has its own binding within the container, bound by its respective class-string.
+e.g. the `FullName` field can be resolved using `app(FullName::class)` and so on.
 
-Now that we're working with the field directly, we would use the `fillAttributeFromRequest` method (instead of providing
-a callback to `fillUsing`)
+Should you need to completely rewire the way that a field is being resolved, you can overwrite any/all the bindings as
+you see fit (though this shouldn't be necessary most of the time).
+_note: you can look at the tests for any examples_
+
+---
+
+### Advanced Usage
+
+In situations where you require custom logic that's beyond the capabilities of what we can
+pass into the config file or the `::fields()` parameters, you can extend any of the
+fields in this package and begin writing your own custom logic. This opens up a lot of doors too!
+
+One example of this would be the need to use custom `fillUsing` logic on one of your fields.
 
 This would look something like this:
 
@@ -145,6 +145,31 @@ class MyAppFullName extends FullName
 > each model. For example, a `UserEmail` field may have its own requirements/logic vs a `CompanyEmail` field.
 > Creating a file for each of these models allows you to write the logic that's specific to each one.
 > These fields can then be used as the source of truth throughout all your Nova projects!
+
+---
+
+### Developer Note
+
+I've only recently started (as of 07/2022) pulling out the common fields that I use in my own Nova projects, but
+eventually I plan
+to move all into this package.
+You'll find a lot of the common fields in here, and I'd welcome contributions for more!
+
+A non-exhaustive list of the fields included are:
+
+- FullName
+- FirstName
+- LastName
+- Email
+- NumericPrimaryKey
+- UsersRole (based a very basic authorization system)
+- UserPassword
+- UserPasswordConfirmation
+- Avatar
+
+_More may have been added since the time of writing_
+
+---
 
 ## Testing
 
