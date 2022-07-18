@@ -2,6 +2,7 @@
 
 namespace Jhavenz\NovaExtendedFields\Fields\Traits;
 
+use Illuminate\Support\Arr;
 use Laravel\Nova\Fields\Field;
 
 trait ExtendedNovaField
@@ -17,6 +18,18 @@ trait ExtendedNovaField
     {
         if (!is_a(static::class, Field::class, true)) {
             throw new \LogicException(__TRAIT__." can only be used with Nova fields");
+        }
+
+        if (count($args) === 1 && Arr::hasAny($args[0], [
+                'name',
+                'attribute',
+                'resolveCallback',
+                'disk',
+                'storageCallback',
+                'resource',
+                'lines',
+            ])) {
+            $args = $args[0];
         }
 
         return static::make(...$args);
