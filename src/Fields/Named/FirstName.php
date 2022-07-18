@@ -35,7 +35,7 @@ class FirstName extends Text
 
     public function getUpdateRules(NovaRequest $request): array
     {
-        return $this->formatNovaRules(['sometimes', 'nullable', 'string', 'min:6', 'max:50', 'email']);
+        return $this->formatNovaRules(['sometimes', 'nullable', 'string', 'min:6', 'max:50']);
     }
 
     public function isShownOnPreview(NovaRequest $request, $resource): bool

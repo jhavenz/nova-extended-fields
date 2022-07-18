@@ -1,6 +1,6 @@
 {
     "name": "jhavenz/nova-extended-fields",
-    "description": "File-based fields for Laravel Nova",
+    "description": "Specific field types for use with Laravel Nova",
     "keywords": [
         "jhavenz",
         "laravel",

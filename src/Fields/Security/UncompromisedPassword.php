@@ -52,13 +52,18 @@ class UncompromisedPassword extends Password
         ]);
     }
 
+    // @formatter:off
     public function isRequired(NovaRequest $request)
     {
         if (isset($this->requiredCallback)) {
             return parent::isRequired($request);
         }
 
-        return $request->isInlineCreateRequest() || $request->isCreateOrAttachRequest();
+        if ($request->isInlineCreateRequest() || $request->isCreateOrAttachRequest()) {
+            return true;
+        }
+
+        return $request->filled($this->attribute);
     }
 
     public function password(): ?string

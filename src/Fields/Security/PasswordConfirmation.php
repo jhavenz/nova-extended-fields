@@ -46,10 +46,13 @@ class PasswordConfirmation extends BasePasswordConfirmation
         ]);
     }
 
+    // @formatter:off
     public function isRequired(NovaRequest $request)
     {
-        return $request->isCreateOrAttachRequest()
+        return $request->filled($this->passwordAttribute) && (
+            $request->isCreateOrAttachRequest()
             || $request->isInlineCreateRequest()
-            || $request->isUpdateOrUpdateAttachedRequest();
+            || $request->isUpdateOrUpdateAttachedRequest()
+        );
     }
 }
