@@ -4,6 +4,7 @@ namespace Jhavenz\NovaExtendedFields\Fields\Traits;
 
 use Illuminate\Support\Arr;
 use Laravel\Nova\Fields\Field;
+use Nette\Utils\Arrays;
 
 trait ExtendedNovaField
 {
@@ -20,16 +21,14 @@ trait ExtendedNovaField
             throw new \LogicException(__TRAIT__." can only be used with Nova fields");
         }
 
-        if (count($args) === 1 && Arr::hasAny($args[0], [
-                'name',
-                'attribute',
-                'resolveCallback',
-                'disk',
-                'storageCallback',
-                'resource',
-                'lines',
-            ])) {
-            $args = $args[0];
+        $constructor = new \ReflectionMethod(static::class, '__construct');
+
+        foreach ($constructor->getParameters() as $param) {
+            if (count($args) === 1 && Arr::has(Arr::first($args), $param->getName())) {
+                $params = Arrays::invokeMethod($constructor->getParameters(), 'getName');
+                $args = array_filter($args[0], fn($arg, $key) => in_array($key, $params), ARRAY_FILTER_USE_BOTH);
+                break;
+            }
         }
 
         return static::make(...$args);
