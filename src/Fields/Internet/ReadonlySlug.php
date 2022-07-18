@@ -5,7 +5,6 @@ namespace Jhavenz\NovaExtendedFields\Fields\Internet;
 use Illuminate\Support\Str;
 use Jhavenz\NovaExtendedFields\Enums\IRoles;
 use Jhavenz\NovaExtendedFields\Fields\Traits\ExtendedNovaField;
-use Jhavenz\NovaExtendedFields\Fields\Traits\FormatsNovaRules;
 use Jhavenz\NovaExtendedFields\Fields\Traits\HasUniqueRule;
 use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -15,7 +14,6 @@ use function Jhavenz\LaravelHelpers\Helpers\gate;
 class ReadonlySlug extends Slug
 {
     use ExtendedNovaField;
-    use FormatsNovaRules;
     use HasUniqueRule;
 
     public function __construct($name = 'Slug', $attribute = 'slug', $resolveCallback = null)

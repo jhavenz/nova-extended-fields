@@ -26,7 +26,7 @@ class FullName extends Text
 
     public function getRules(NovaRequest $request): array
     {
-        return [
+        return $this->formatNovaRules([
             ...$this->isRequired($request) ? ['required'] : ['sometimes', 'nullable'],
             'string',
             'min:5',
@@ -39,9 +39,9 @@ class FullName extends Text
                 preg_match('#\s#', $value, $whitespaceMatches);
 
                 if (empty($whitespaceMatches)) {
-                    $fail("Full name must contain a first and last name with a space in between");
+                    $fail('Full name must contain a first and last name with a space in between');
                 }
             },
-        ];
+        ]);
     }
 }

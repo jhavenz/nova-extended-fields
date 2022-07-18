@@ -3,7 +3,6 @@
 namespace Jhavenz\NovaExtendedFields\Fields\Internet;
 
 use Jhavenz\NovaExtendedFields\Fields\Traits\ExtendedNovaField;
-use Jhavenz\NovaExtendedFields\Fields\Traits\FormatsNovaRules;
 use Jhavenz\NovaExtendedFields\Fields\Traits\HasUniqueRule;
 use Laravel\Nova\Fields\Email as BaseEmail;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -11,7 +10,6 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 class BasicEmail extends BaseEmail
 {
     use ExtendedNovaField;
-    use FormatsNovaRules;
     use HasUniqueRule;
 
     public function getUpdateRules(NovaRequest $request): array

@@ -30,12 +30,12 @@ class LastName extends Text
 
     public function getRules(NovaRequest $request): array
     {
-        return ['required', 'min:6', 'max:50'];
+        return $this->formatNovaRules(['required', 'min:6', 'max:50']);
     }
 
     public function getUpdateRules(NovaRequest $request): array
     {
-        return ['sometimes', 'nullable', 'min:6', 'max:50'];
+        return $this->formatNovaRules(['sometimes', 'nullable', 'min:6', 'max:50']);
     }
 
     public function isShownOnPreview(NovaRequest $request, $resource): bool

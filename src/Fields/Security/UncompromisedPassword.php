@@ -6,14 +6,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Jhavenz\LaravelHelpers\Traits\HasHashedPassword;
 use Jhavenz\NovaExtendedFields\Fields\Traits\ExtendedNovaField;
-use Jhavenz\NovaExtendedFields\Fields\Traits\FormatsNovaRules;
 use Laravel\Nova\Fields\Password;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class UncompromisedPassword extends Password
 {
     use ExtendedNovaField;
-    use FormatsNovaRules;
     use HasHashedPassword;
 
     public function __construct(
