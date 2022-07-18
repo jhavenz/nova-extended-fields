@@ -2,7 +2,7 @@
 
 namespace Jhavenz\NovaExtendedFields\Tests\fixtures;
 
-use Jhavenz\NovaExtendedFields\Named\FullName;
+use Jhavenz\NovaExtendedFields\Fields\Named\FullName;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Resource;
 

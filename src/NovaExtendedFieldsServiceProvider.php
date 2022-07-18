@@ -3,6 +3,7 @@
 namespace Jhavenz\NovaExtendedFields;
 
 use Jhavenz\NovaExtendedFields\Commands\ExtendedFieldMakeCommand;
+use Jhavenz\NovaExtendedFields\Enums\IRoles;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -17,14 +18,12 @@ class NovaExtendedFieldsServiceProvider extends PackageServiceProvider
 
     public function packageRegistered()
     {
-        NovaExtendedFields::registerBindings();
-
         if (!$this->app->runningInConsole()) {
             return;
         }
 
         $this->commands([
-            ExtendedFieldMakeCommand::class
+            ExtendedFieldMakeCommand::class,
         ]);
     }
 }

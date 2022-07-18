@@ -143,7 +143,7 @@ class ExtendedFieldMakeCommand extends GeneratorCommand
                 $stub
             );
         } else {
-            // remove the use statement, we're going to extend the parent's FQCN 
+            // remove the use statement, we're going to extend the parent's FQCN
             str_replace(
                 'use {{ parentNamespace }};',
                 '',

@@ -2,7 +2,7 @@
 
 namespace {{ rootNamespace }};
 
-use Jhavenz\NovaExtendedFields\Concerns\ExtendedNovaField;
+use Jhavenz\NovaExtendedFields\Fields\Traits\ExtendedNovaField;
 use {{ parentNamespace }};
 
 class {{ class }} extends {{ parentBasename }}

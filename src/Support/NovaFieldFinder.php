@@ -9,6 +9,9 @@ use Symfony\Component\Finder\Finder;
 
 use function Jhavenz\rescueQuietly;
 
+/**
+ * Used when generating new extended fields using the command
+ */
 class NovaFieldFinder
 {
     private static array $fields = [];
@@ -49,7 +52,7 @@ class NovaFieldFinder
         return Text::class;
     }
 
-    protected static function novaFieldsFinder()
+    protected static function novaFieldsFinder(): Finder
     {
         return Finder::create()
             ->files()
@@ -85,12 +88,12 @@ class NovaFieldFinder
             return $key;
         }
 
-        if (array_key_exists($two = basename($key, 'php'), self::$fields)) {
-            return $two;
+        if (array_key_exists($keyTwo = basename($key, 'php'), self::$fields)) {
+            return $keyTwo;
         }
 
-        if (array_key_exists($key = strtolower(class_basename($key)), self::$fields)) {
-            return $key;
+        if (array_key_exists($keyThree = strtolower(class_basename($key)), self::$fields)) {
+            return $keyThree;
         }
 
         return false;

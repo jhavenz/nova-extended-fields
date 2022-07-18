@@ -128,7 +128,7 @@ This would look something like this:
 
 namespace App\Nova\Resources\Fields\Shared;
 
-use Jhavenz\NovaExtendedFields\Named\FullName;
+use Jhavenz\NovaExtendedFields\Fields\Named\FullName;
 
 class MyAppFullName extends FullName
 {
