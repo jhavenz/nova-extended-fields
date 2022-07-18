@@ -1,5 +1,8 @@
 ### File-based fields for Laravel Nova
 
+> Important:
+> This package is still in development/pre-release mode. Please do not use in production yet.
+
 Personally, I'm not a fan of configuring all of my Nova fields within the 'fields' array that Nova expects.
 
 Additionally, most of the fields used across Nova projects tend to have a lot in common...
@@ -9,11 +12,6 @@ configure each field with an array and having to (visually) parse through all fi
 you're looking for each time? That's what this package aims to fix.
 
 So, instead of something like this in your Nova project:
-_fyi...`rescueQuietly()` is just a helper I use a lot who's 3rd argument (`$report: true`) for the `rescue` method is
-set to `false`_
-
-> Important:
-> This package is still in development/pre-release mode. Please do not use in production yet.
 
 ```php
 <?php
@@ -32,13 +30,14 @@ class NovaUser extends Resource
             Text::make('Full Name')
                 ->sortable()
                 ->rules('required', 'string', 'min:6', 'max:25', function ($attr, $value, $fail) {
-                    [$first, $last] = rescueQuietly(
-                        fn() => explode(' ', $value),
-                        fn() => $fail("Name is invalid. Be sure there's a space between your first and last name")
-                    );
-                    
-                    if (count(explode(' ', $value)) > 2) { 
-                        $fail("We don't allow more than 2 words for your Name. If needed, please join your first/last name. e.g. Wernher VonBraun")
+                    if (!(filled($value) && is_string($value))) {
+                        return;
+                    }
+    
+                    preg_match('#\s#', $value, $whitespaceMatches);
+    
+                    if (empty($whitespaceMatches)) {
+                        $fail("Full name must contain a first and last name with a space in between");
                     }
                     
                     //etc.
@@ -50,6 +49,11 @@ class NovaUser extends Resource
 }
 
 ```
+
+_fyi...`rescueQuietly()` is just a helper function from
+my [jh-laravel-helpers](https://github.com/jhavenz/jh-laravel-helpers) package_
+
+---
 
 **To something like this:**
 
