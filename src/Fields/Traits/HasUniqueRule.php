@@ -31,6 +31,13 @@ trait HasUniqueRule
         return $this;
     }
 
+    public function setTable(string $table): static
+    {
+        $this->table = $table;
+
+        return $this;
+    }
+
     public static function uniqueBy(string $table, ...$fieldArgs): static
     {
         return tap(static::make(...$fieldArgs), function ($self) use ($table) {

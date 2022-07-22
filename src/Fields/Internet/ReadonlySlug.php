@@ -3,13 +3,13 @@
 namespace Jhavenz\NovaExtendedFields\Fields\Internet;
 
 use Illuminate\Support\Str;
-use Jhavenz\NovaExtendedFields\Enums\IRoles;
 use Jhavenz\NovaExtendedFields\Fields\Traits\ExtendedNovaField;
 use Jhavenz\NovaExtendedFields\Fields\Traits\HasUniqueRule;
 use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use LogicException;
 
-use function Jhavenz\LaravelHelpers\Helpers\gate;
+use function Jhavenz\LaravelHelpers\Helpers\novaRequest;
 
 class ReadonlySlug extends Slug
 {
@@ -23,15 +23,23 @@ class ReadonlySlug extends Slug
             $attribute,
             $resolveCallback
         );
+
+        $this->exceptOnForms();
     }
 
-    public function getCreationRules(NovaRequest $request)
+    public function from($from): static
+    {
+        return parent::from($from);
+    }
+
+    public function getRules(NovaRequest $request): array
     {
         return $this->formatNovaRules(
             $this->addUniqueRule([
-                ...$this->isRequired($request) ? ['required'] : ['sometimes', 'nullable'],
+                'sometimes',
+                'nullable',
                 'string',
-                'min:6',
+                'min:2',
                 'max:191',
             ])
         );
@@ -39,10 +47,11 @@ class ReadonlySlug extends Slug
 
     public function isReadonly(NovaRequest $request): bool
     {
-        if ($request->isInlineCreateRequest() || $request->isCreateOrAttachRequest()) {
-            return gate()->denies('create', app(IRoles::class));
-        }
+        return true;
+    }
 
+    public function isShownOnPreview(NovaRequest $request, $resource): bool
+    {
         return true;
     }
 
@@ -53,9 +62,35 @@ class ReadonlySlug extends Slug
 
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
+        $request->filled($from = $this->from->attribute) &&
         $request->whenFilled(
             $requestAttribute,
-            fn($slug) => empty($model->getAttribute($attribute)) && $model->setAttribute($attribute, Str::slug($slug))
+            fn($slug) => empty($model->getAttribute($attribute)) &&
+                $model->setAttribute(
+                    $attribute,
+                    Str::slug($request->input($from))
+                )
         );
+    }
+
+    public function jsonSerialize(): array
+    {
+        if (!isset($this->from)) {
+            throw new LogicException(
+                "[from] attribute is required for Slug fields. This field's value will be auto-created when a resource is created"
+            );
+        }
+
+        if (novaRequest()->isInlineCreateRequest() ||
+            novaRequest()->isUpdateOrUpdateAttachedRequest() ||
+            novaRequest()->isCreateOrAttachRequest()) {
+            if (!isset($this->table, $this->column)) {
+                throw new LogicException(
+                    'ReadonlySlug requires the [table] and [column] properties to be set for determining uniqueness'
+                );
+            }
+        }
+
+        return parent::jsonSerialize();
     }
 }

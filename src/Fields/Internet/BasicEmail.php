@@ -34,6 +34,7 @@ class BasicEmail extends BaseEmail
                 'string',
                 'min:6',
                 'max:50',
+                'email',
             ])
         );
     }

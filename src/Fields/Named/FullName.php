@@ -29,8 +29,8 @@ class FullName extends Text
         return $this->formatNovaRules([
             ...$this->isRequired($request) ? ['required'] : ['sometimes', 'nullable'],
             'string',
-            'min:5',
-            'max:50',
+            'min:3',
+            'max:100',
             function ($attr, $value, $fail) {
                 if (!(filled($value) && is_string($value))) {
                     return;
